@@ -4,13 +4,53 @@ pragma solidity ^0.8.17;
 
 import "console.sol";
 
+struct CanidatePoW {
+    address miner;
+    uint64 nonce;
+}
+
+struct UserAction {
+    address user;
+    bytes32 name;
+    address value;
+    uint32 nonce;
+    bytes sig;
+}
+
 contract PoW {
+    bytes32 public parent_hash;
+    uint32 public parent_height;
+    uint64 public parent_nonce;
     uint8 public parent_difficulty;
+    uint public prev_timestamp;
+    uint public gap_timestamp;
+
     address public owner;
+    uint public block_height;
 
     constructor() {
         owner = msg.sender;
         parent_difficulty = 238;
+        parent_height = 0;
+        prev_timestamp = block.timestamp;
+        gap_timestamp = 10;
+    }
+
+    function new_block(CanidatePoW memory mining, UserAction[] memory updates) external returns (bytes32) {
+        require(block.timestamp >= prev_timestamp + gap_timestamp, "too early");
+        // require(parent_height + 1 == mining.block_height, "try add_block");
+        bytes32 block_hash = sha256(bytes.concat(parent_hash, bytes4(parent_height+1), bytes20(mining.miner), bytes8(mining.nonce)));
+        console.logBytes32(parent_hash);
+        console.logUint(uint256(block_hash));
+        console.logUint(2**parent_difficulty);
+        console.logBool(uint256(block_hash) < 2**parent_difficulty);
+        require(uint256(block_hash) < 2**parent_difficulty, "difficulty required");
+
+        parent_hash = block_hash;
+        parent_nonce = mining.nonce;
+        parent_height = parent_height+1;
+        prev_timestamp = block.timestamp;
+        return block_hash;
     }
 
     function get_number() public view returns (uint) {
