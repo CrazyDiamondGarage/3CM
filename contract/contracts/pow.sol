@@ -2,8 +2,15 @@
 
 pragma solidity ^0.8.17;
 
+import "console.sol";
+
 contract PoW {
+    uint8 public parent_difficulty;
+    address public owner;
+
     constructor() {
+        owner = msg.sender;
+        parent_difficulty = 238;
     }
 
     function get_number() public view returns (uint) {
