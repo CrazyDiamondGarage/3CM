@@ -4,7 +4,7 @@ pragma solidity ^0.8.17;
 
 import "console.sol";
 
-struct CanidatePoW {
+struct PoWCanidate {
     address miner;
     uint64 nonce;
 }
@@ -36,7 +36,7 @@ contract PoW {
         gap_timestamp = 10;
     }
 
-    function new_block(CanidatePoW memory mining, UserAction[] memory updates) external returns (bytes32) {
+    function new_block(PoWCanidate memory mining, UserAction[] memory updates) external returns (bytes32) {
         require(block.timestamp >= prev_timestamp + gap_timestamp, "too early");
         // require(parent_height + 1 == mining.block_height, "try add_block");
         bytes32 block_hash = sha256(bytes.concat(parent_hash, bytes4(parent_height+1), bytes20(mining.miner), bytes8(mining.nonce)));
