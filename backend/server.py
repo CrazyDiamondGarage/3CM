@@ -1,10 +1,11 @@
 
 import tornado.web
+import tornado.websocket
 import tornado.ioloop
 import tornado.gen
 import tornado.escape
-import tornado.options
-import tornado.httpserver
+# import tornado.options
+# import tornado.httpserver
 
 class Application(tornado.web.Application):
     def __init__(self):
@@ -12,6 +13,7 @@ class Application(tornado.web.Application):
                 (r"/static/(.*)", tornado.web.StaticFileHandler, {"path": "static/"}),
                 (r"/dashboard", DashboardHandler),
                 (r"/req", ReqHandler),
+                (r"/pool", PoolHandler),
                 (r"/", MainHandler),
             ]
         settings = {"debug":True}
@@ -33,6 +35,21 @@ class ReqHandler(tornado.web.RequestHandler):
         global tasks_pool
         print(self.request.body)
         self.finish({})
+
+
+class PoolHandler(tornado.websocket.WebSocketHandler):
+    def check_origin(self, origin):
+        return True
+
+    def open(self):
+        pass
+
+    def on_close(self):
+        pass
+
+    # @tornado.gen.coroutine
+    def on_message(self, message):
+        print(message)
 
 
 def main():
