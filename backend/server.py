@@ -9,7 +9,9 @@ import tornado.httpserver
 class Application(tornado.web.Application):
     def __init__(self):
         handlers = [
+                (r"/static/(.*)", tornado.web.StaticFileHandler, {"path": "static/"}),
                 (r"/dashboard", DashboardHandler),
+                (r"/req", ReqHandler),
                 (r"/", MainHandler),
             ]
         settings = {"debug":True}
@@ -24,6 +26,13 @@ class MainHandler(tornado.web.RequestHandler):
 class DashboardHandler(tornado.web.RequestHandler):
     def get(self):
         self.render('index.html')
+
+tasks_pool = []
+class ReqHandler(tornado.web.RequestHandler):
+    def post(self):
+        global tasks_pool
+        print(self.request.body)
+        self.finish({})
 
 
 def main():

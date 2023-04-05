@@ -53,6 +53,18 @@ contract PoW {
         return block_hash;
     }
 
+    function add_block(PoWCanidate memory mining, UserAction[] memory updates) external returns (bytes32) {
+        require(parent_height > 0, "try new_block");
+        require(mining.nonce < parent_nonce, "lucky nonce required");
+        // require(parent_height == mining.block_height, "try new_block");
+        bytes32 block_hash = sha256(bytes.concat(parent_hash, bytes4(parent_height), bytes20(mining.miner), bytes8(mining.nonce)));
+        require(uint256(block_hash) < 2**parent_difficulty, "difficulty required");
+
+        parent_hash = block_hash;
+        parent_nonce = mining.nonce;
+        return block_hash;
+    }
+
     function get_number() public view returns (uint) {
         return block.number;
     }
