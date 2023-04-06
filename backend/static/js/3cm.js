@@ -8,6 +8,7 @@ const contract_abi = [
 
 console.log("3cm.js loaded");
 console.log(ethers);
+console.log("ethers loaded");
 
 const contract_address = "0x489d1d4b0DcD6aD354C708630fed4B21a8c7a56A";
 // const erc20 = new ethers.Contract(address, abi, provider);
@@ -22,6 +23,33 @@ reg_btn.onclick = (evt) => {
     body: JSON.stringify({ name: reg_name.value }),
   });
 };
+
+console.log("dddd");
+
+var template = document.getElementById("sample").content;
+var copyTemplate = document.importNode(template, true);
+var app = document.getElementById("app");
+var add = document.getElementById("addBtn");
+var renderedItems = app.children;
+
+add.addEventListener("click", (e) => {
+  copyTemplate.querySelector("#label").textContent = "label";
+  copyTemplate.querySelector("#title").textContent = "Item name";
+  copyTemplate.querySelector("#desc").textContent =
+    "This could be a bit longer description that is forwarded from textarea value.";
+  app.appendChild(copyTemplate.cloneNode(true));
+});
+
+app.addEventListener("click", removeItem);
+
+function removeItem(e) {
+  renderedItems.forEach((item) => {
+    if (e.target.classList.contains("material-symbols-outlined")) {
+      var project = e.target.parentElement.parentElement;
+      project.remove();
+    }
+  });
+}
 
 window.onload = async () => {
   // if (typeof window.ethereum !== 'undefined') {
@@ -90,3 +118,5 @@ window.onload = async () => {
   //     }
   // }
 };
+
+console.log("asdfaslkdfjalsdkjf;l");
