@@ -28,7 +28,7 @@ struct UserAction {
 contract PoW {
     bytes32 public parent_hash;
     uint32 public parent_height;
-    uint64 public parent_nonce;
+    // uint64 public parent_nonce;
     uint8 public parent_difficulty;
     uint public prev_timestamp;
     uint public gap_timestamp;
@@ -48,11 +48,13 @@ contract PoW {
         gap_timestamp = 10;
     }
 
-    function new_block(bytes32 commitment, address miner, uint64 nonce, UserAction[] memory updates) external returns (bytes32) {
+    function new_block(bytes32 commitment, uint64 nonce, UserAction[] memory updates) external returns (bytes32) {
+        address miner = msg.sender;
         require(block.timestamp >= prev_timestamp + gap_timestamp, "too early");
         PoWCanidate memory canidate;
         for (uint i = 0; i < canidates.length; i++) {
             canidate = canidates[i];
+            // parent_hash = block_hash;
         }
 
         console.logBytes32(canidate.commitment);
@@ -67,22 +69,22 @@ contract PoW {
         // console.logBool(uint256(block_hash) < 2**parent_difficulty);
         require(uint256(block_hash) < 2**parent_difficulty, "difficulty required");
 
-        parent_hash = block_hash;
-        parent_nonce = nonce;
-        parent_height = parent_height+1;
+        // parent_nonce = nonce;
+        // parent_height = parent_height+1;
         prev_timestamp = block.timestamp;
         return block_hash;
     }
 
-    function add_block(bytes32 commitment, address miner, uint64 nonce, UserAction[] memory updates) external returns (bytes32) {
-        require(parent_height > 0, "try new_block");
+    function add_block(bytes32 commitment, uint64 nonce, UserAction[] memory updates) external returns (bytes32) {
+        address miner = msg.sender;
+        // require(parent_height > 0, "try new_block");
         // require(nonce < parent_nonce, "lucky nonce required");
         // require(parent_height == mining.block_height, "try new_block");
-        bytes32 block_hash = sha256(bytes.concat(parent_hash, bytes4(parent_height), bytes20(miner), bytes8(nonce)));
+        bytes32 block_hash = sha256(bytes.concat(parent_hash, commitment, bytes4(parent_height+1), bytes20(miner), bytes8(nonce)));
         require(uint256(block_hash) < 2**parent_difficulty, "difficulty required");
 
-        parent_hash = block_hash;
-        parent_nonce = nonce;
+        // parent_hash = block_hash;
+        // parent_nonce = nonce;
         return block_hash;
     }
 
