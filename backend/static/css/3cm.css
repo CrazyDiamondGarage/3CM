@@ -1,0 +1,30 @@
+body {
+  background: linear-gradient(90deg, rgba(82, 0, 255, 0.6) 0%, rgba(82, 0, 255, 0) 49.18%, rgba(82, 0, 255, 0.6) 100%),
+    indianred;
+}
+
+#home-bg {
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  margin: auto;
+  width: 100vw;
+  height: 100vh;
+  background-image: url("../img/bg_cross.svg");
+  opacity: 0.2;
+  animation: scroll 3s linear infinite;
+}
+
+@keyframes scroll {
+  100% {
+    background-position: 88px -88px;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  #home-bg {
+    background-size: 44px;
+  }
+}
