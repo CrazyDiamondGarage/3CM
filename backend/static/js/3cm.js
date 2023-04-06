@@ -1,5 +1,23 @@
 import { ethers } from "./ethers-5.7.esm.min.js";
 
+//! mi2ma parts below: ddd block
+
+const template = document.getElementById("sample").content;
+const copyTemplate = document.importNode(template, true);
+const app = document.getElementById("app");
+const add = document.getElementById("addBtn");
+const renderedItems = app.children;
+
+const addBlock = () => {
+  copyTemplate.querySelector("#label").textContent = "label";
+  copyTemplate.querySelector("#title").textContent = "Item name";
+  copyTemplate.querySelector("#desc").textContent =
+    "This could be a bit longer description that is forwarded from textarea value.";
+  app.appendChild(copyTemplate.cloneNode(true));
+};
+
+//! KJ Parts below
+
 const contract_abi = [
   "function mint(bytes memory handle) public",
   "function resolve(bytes memory handle) public view returns (address)",
@@ -22,23 +40,10 @@ reg_btn.onclick = (evt) => {
     method: "POST",
     body: JSON.stringify({ name: reg_name.value }),
   });
+
+  //!TODO: addBlock() in callback function
+  addBlock();
 };
-
-const template = document.getElementById("sample").content;
-const copyTemplate = document.importNode(template, true);
-const app = document.getElementById("app");
-const add = document.getElementById("addBtn");
-const renderedItems = app.children;
-
-const addItemFunc = () => {
-  copyTemplate.querySelector("#label").textContent = "label";
-  copyTemplate.querySelector("#title").textContent = "Item name";
-  copyTemplate.querySelector("#desc").textContent =
-    "This could be a bit longer description that is forwarded from textarea value.";
-  app.appendChild(copyTemplate.cloneNode(true));
-};
-
-add.onclick = addItemFunc;
 
 window.onload = async () => {
   // if (typeof window.ethereum !== 'undefined') {
