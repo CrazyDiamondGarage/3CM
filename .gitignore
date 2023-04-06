@@ -5,3 +5,7 @@ __pycache__
 contract/build/
 contract/reports/
 contract/node_modules/
+.idea
+
+.DS_Store
+.vscode/
