@@ -4,3 +4,4 @@ __pycache__
 .hypothesis/
 contract/build/
 contract/reports/
+contract/node_modules/

@@ -1,10 +1,18 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity ^0.8.17;
+pragma solidity ^0.8.18;
 
-import "console.sol";
+import "./console.sol";
+
 
 struct PoWCanidate {
+    bytes32 commitment;
+    address miner;
+    uint64 nonce;
+    PoWVote[] votes;
+}
+
+struct PoWVote {
     address miner;
     uint64 nonce;
 }
@@ -36,10 +44,10 @@ contract PoW {
         gap_timestamp = 10;
     }
 
-    function new_block(PoWCanidate memory mining, UserAction[] memory updates) external returns (bytes32) {
-        require(block.timestamp >= prev_timestamp + gap_timestamp, "too early");
+    function new_block(bytes32 commitment, address miner, uint64 nonce, UserAction[] memory updates) external returns (bytes32) {
+        // require(block.timestamp >= prev_timestamp + gap_timestamp, "too early");
         // require(parent_height + 1 == mining.block_height, "try add_block");
-        bytes32 block_hash = sha256(bytes.concat(parent_hash, bytes4(parent_height+1), bytes20(mining.miner), bytes8(mining.nonce)));
+        bytes32 block_hash = sha256(bytes.concat(parent_hash, commitment, bytes4(parent_height+1), bytes20(miner), bytes8(nonce)));
         console.logBytes32(parent_hash);
         console.logUint(uint256(block_hash));
         console.logUint(2**parent_difficulty);
@@ -47,13 +55,13 @@ contract PoW {
         require(uint256(block_hash) < 2**parent_difficulty, "difficulty required");
 
         parent_hash = block_hash;
-        parent_nonce = mining.nonce;
+        parent_nonce = nonce;
         parent_height = parent_height+1;
         prev_timestamp = block.timestamp;
         return block_hash;
     }
 
-    function add_block(PoWCanidate memory mining, UserAction[] memory updates) external returns (bytes32) {
+    function add_block(bytes32 commitment, PoWVote memory mining, UserAction[] memory updates) external returns (bytes32) {
         require(parent_height > 0, "try new_block");
         require(mining.nonce < parent_nonce, "lucky nonce required");
         // require(parent_height == mining.block_height, "try new_block");
