@@ -5,3 +5,4 @@ __pycache__
 contract/build/
 contract/reports/
 contract/node_modules/
+.idea
