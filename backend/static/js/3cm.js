@@ -19,16 +19,17 @@ const addBlock = () => {
 //! KJ Parts below
 
 const contract_abi = [
-  "function mint(bytes memory handle) public",
+  "event NewBlock(bytes32 indexed, bytes32 indexed, address indexed, uint)",
   "function resolve(bytes memory handle) public view returns (address)",
   "function reverse(address user) public view returns (string memory)",
 ];
 
 console.log("3cm.js loaded");
-console.log(ethers);
+// console.log(ethers);
 console.log("ethers loaded");
 
-const contract_address = "0x489d1d4b0DcD6aD354C708630fed4B21a8c7a56A";
+const contract_address = "0x5fbdb2315678afecb367f032d93f642f64180aa3";
+const provider = new ethers.providers.JsonRpcProvider( 'http://127.0.0.1:8545' );
 // const erc20 = new ethers.Contract(address, abi, provider);
 
 const reg_name = document.getElementById("reg_name");
@@ -82,7 +83,9 @@ window.onload = async () => {
   //     }
   //     const provider = new ethers.providers.Web3Provider(window.ethereum);
   //     const signer = provider.getSigner();
-  //     const contract = new ethers.Contract(contract_address, contract_abi, signer);
+      const contract = new ethers.Contract(contract_address, contract_abi, provider);
+      const events = await contract.queryFilter('NewBlock');  
+      console.log(events);
   //     handle_mint_btn.onclick = async (evt) => {
   //         const handle = new TextEncoder().encode(handle_mint.value);
   //         await contract.mint(handle);

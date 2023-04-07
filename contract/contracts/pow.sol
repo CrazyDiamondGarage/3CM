@@ -42,7 +42,7 @@ contract PoW {
     mapping(address => PoWVote) public votes;
     mapping(bytes32 => PoWCanidate) public canidates;
 
-    event NewBlock(bytes32, bytes32, address, uint);
+    event NewBlock(bytes32 indexed, bytes32, address, uint);
 
     constructor() {
         // owner = msg.sender;
