@@ -1,6 +1,6 @@
-import pytest
 import hashlib
 
+import pytest
 import web3
 
 from brownie import PoW, accounts
