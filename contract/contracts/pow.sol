@@ -42,7 +42,7 @@ contract PoW {
     mapping(address => PoWVote) public votes;
     mapping(bytes32 => PoWCanidate) public canidates;
 
-    event NewBlock(address miner, uint height);
+    event NewBlock(bytes32, bytes32, address, uint);
 
     constructor() {
         // owner = msg.sender;
@@ -50,7 +50,7 @@ contract PoW {
         parent_height = 0;
         // prev_timestamp = block.timestamp;
         prev_timestamp = 0;
-        gap_seconds = 10;
+        gap_seconds = 0;
     }
 
     function new_block(bytes32 commitment, uint64 nonce, UserAction[] memory updates) external returns (bytes32) {
@@ -77,23 +77,15 @@ contract PoW {
         // console.logBool(uint256(block_hash) < 2**parent_difficulty);
         require(uint256(block_hash) < 2**parent_difficulty, "difficulty required");
 
-        // PoWVote memory vote;
-        // vote.miner = miner;
-        // vote.nonce = nonce;
-        // PoWCanidate storage canidate;
-        // canidate.commitment = commitment;
-        // canidate.miner = miner;
-        // canidate.nonce = nonce;
-        // canidate.votes.push(vote);
-        // canidate.votes = PoWVote[];
-
-        miner_count = 1;
-        miners[0] = miner;
+        miner_count = 0;
+        miners[miner_count] = miner;
         votes[miner] = PoWVote(commitment, nonce);
         canidates[commitment] = PoWCanidate(miner, nonce);
         // parent_nonce = nonce;
         // parent_height = parent_height+1;
         prev_timestamp = block.timestamp;
+
+        emit NewBlock(block_hash, commitment, miner, nonce);
         return block_hash;
     }
 
@@ -105,8 +97,13 @@ contract PoW {
         bytes32 block_hash = sha256(bytes.concat(parent_hash, commitment, bytes4(parent_height+1), bytes20(miner), bytes8(nonce)));
         require(uint256(block_hash) < 2**parent_difficulty, "difficulty required");
 
+        miner_count += 1;
+        miners[miner_count] = miner;
+        votes[miner] = PoWVote(commitment, nonce);
+        canidates[commitment] = PoWCanidate(miner, nonce);
         // parent_hash = block_hash;
         // parent_nonce = nonce;
+        emit NewBlock(block_hash, commitment, miner, nonce);
         return block_hash;
     }
 
@@ -114,10 +111,6 @@ contract PoW {
         address miner = msg.sender;
         bytes32 block_hash = sha256(bytes.concat(parent_hash));
         canidates[block_hash] = PoWCanidate(miner, 1);
-    }
-
-    function test_delete() public {
-        
     }
 
     function get_number() public view returns (uint) {
