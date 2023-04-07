@@ -2,33 +2,23 @@ import { ethers } from "./ethers-5.7.esm.min.js";
 
 //! mi2ma parts below: ddd block
 
-const template = document.getElementById("sample").content;
-const copyTemplate = document.importNode(template, true);
+const height_template = document.getElementById("height").content;
+const copy_height_template = document.importNode(height_template, true);
+
+const block_template = document.getElementById("block").content;
+const copy_block_template = document.importNode(block_template, true);
+
 const app = document.getElementById("app");
 const add = document.getElementById("addBtn");
 const renderedItems = app.children;
 
-const addBlock = () => {
-  copyTemplate.querySelector("#label").textContent = "label";
-  copyTemplate.querySelector("#title").textContent = "Item name";
-  copyTemplate.querySelector("#desc").textContent =
-    "This could be a bit longer description that is forwarded from textarea value.";
-  app.appendChild(copyTemplate.cloneNode(true));
-};
-
 //! KJ Parts below
 
 const contract_abi = [
-  "event NewBlock(bytes32 indexed, bytes32 indexed, address indexed, uint)",
-  "function resolve(bytes memory handle) public view returns (address)",
-  "function reverse(address user) public view returns (string memory)",
+  "event NewBlock(bytes32, address, uint256)",
 ];
 
-console.log("3cm.js loaded");
-// console.log(ethers);
-console.log("ethers loaded");
-
-const contract_address = "0x5fbdb2315678afecb367f032d93f642f64180aa3";
+const contract_address = "0x9a676e781a523b5d0c0e43731313a708cb607508";
 const provider = new ethers.providers.JsonRpcProvider( 'http://127.0.0.1:8545' );
 // const erc20 = new ethers.Contract(address, abi, provider);
 
@@ -41,9 +31,6 @@ reg_btn.onclick = (evt) => {
     method: "POST",
     body: JSON.stringify({ name: reg_name.value }),
   });
-
-  //!TODO: addBlock() in callback function
-  addBlock();
 };
 
 window.onload = async () => {
@@ -83,35 +70,44 @@ window.onload = async () => {
   //     }
   //     const provider = new ethers.providers.Web3Provider(window.ethereum);
   //     const signer = provider.getSigner();
-      const contract = new ethers.Contract(contract_address, contract_abi, provider);
-      const events = await contract.queryFilter('NewBlock');  
-      console.log(events);
-  //     handle_mint_btn.onclick = async (evt) => {
-  //         const handle = new TextEncoder().encode(handle_mint.value);
-  //         await contract.mint(handle);
-  //         // await contract.mint(ethers.utils.hexlify( Array.from()));
-  //     }
-  //     handle_resolve_btn.onclick = async (evt) => {
-  //         console.log(handle_resolve.value);
-  //         const handle_bytes = new TextEncoder().encode(handle_resolve.value);
-  //         const address = await contract.resolve(handle_bytes);
-  //         console.log(address);
-  //         handle_resolve_result.innerText = address;
-  //     }
-  //     handle_reverse_btn.onclick = async (evt) => {
-  //         console.log(handle_reverse.value);
-  //         const handle = await contract.reverse(handle_reverse.value);
-  //         console.log(handle);
-  //         handle_reverse_result.innerText = handle;
-  //     }
-  //     metadata_save_btn.onclick = async (evt) => {
-  //         const rsp = await fetch(`/save_metadata?token=${jwt}&wallet=${ethereum.selectedAddress}`, {method:'POST', body: metadata.value});
-  //     }
-  //     metadata_verify_btn.onclick = async (evt) => {
-  //         console.log(metadata.value);
-  //     }
-  //     metadata_generate_btn.onclick = async (evt) => {
-  //         const rsp = await fetch(`/generate_metadata_root?token=${jwt}`, {method:'POST', body: metadata.value});
-  //     }
   // }
+
+  const contract = new ethers.Contract(contract_address, contract_abi, provider);
+  const events = await contract.queryFilter('NewBlock');
+  // console.log(events);
+
+  for(var i in events){
+    console.log(events[i].topics);
+
+    var height_container = document.getElementById(events[i].topics[3]);
+    // console.log(height_container);
+    if(!height_container){
+      copy_height_template.querySelector("#label").textContent = events[i].topics[3].replace('0x000000000000000000000000000000000000000000000000000000000000', '');
+      // copy_height_template.querySelector("#title").textContent = events[i].topics[1];
+      var fargment = copy_height_template.cloneNode(true);
+      // console.log(fargment.firstElementChild);
+      fargment.firstElementChild.setAttribute('id', events[i].topics[3]);
+      app.appendChild(fargment);
+    }
+
+    height_container = document.getElementById(events[i].topics[3]);
+    const block_container = document.getElementById(events[i].topics[1]);
+    console.log(events[i].topics[1], block_container);
+
+    if(block_container){
+      const vote = block_container.querySelector("#vote").textContent;
+      console.log(vote);
+
+      block_container.querySelector("#vote").textContent = (parseInt(vote)+1).toString();
+    }else{
+      copy_block_template.querySelector("#vote").textContent = '1';
+      copy_block_template.querySelector("#title").textContent = events[i].topics[1];
+      var fargment = copy_block_template.cloneNode(true);
+      // console.log(fargment.firstElementChild);
+      fargment.firstElementChild.setAttribute('id', events[i].topics[1]);
+      height_container.querySelector('#height_blocks').appendChild(fargment);
+    }  
+
+  }
+
 };
