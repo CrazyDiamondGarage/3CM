@@ -1,4 +1,5 @@
 import hashlib
+import binascii
 
 import pytest
 import web3
@@ -14,10 +15,11 @@ def test_pow(pow):
     addr = web3.Web3.toBytes(hexstr=accounts[0].address)
     nonce = 0
     while True:
-        pow_output = hashlib.sha256(b'\x00'*32 + hash_bytes + (1).to_bytes(4, 'big') + addr + nonce.to_bytes(8, 'big')).digest()
-        if int.from_bytes(pow_output, 'big') < 2**238:
+        pow_output1 = hashlib.sha256(b'\x00'*32 + hash_bytes + (1).to_bytes(4, 'big') + addr + nonce.to_bytes(8, 'big')).digest()
+        if int.from_bytes(pow_output1, 'big') < 2**238:
             break
         nonce += 1
+    print(binascii.hexlify(pow_output1))
     pow.new_block(hash_bytes, nonce, [], {'from': accounts[0]})
 
     addr = web3.Web3.toBytes(hexstr=accounts[1].address)
@@ -38,3 +40,17 @@ def test_pow(pow):
             break
         nonce += 1
     pow.add_block(hash_bytes, nonce, [], {'from': accounts[2]})
+
+    hash_bytes = hashlib.sha256(b'abc2').digest()
+    addr = web3.Web3.toBytes(hexstr=accounts[0].address)
+    print(binascii.hexlify(hash_bytes))
+    print(accounts[0].address)
+
+    nonce = 0
+    while True:
+        pow_output2 = hashlib.sha256(pow_output1 + hash_bytes + (2).to_bytes(4, 'big') + addr + nonce.to_bytes(8, 'big')).digest()
+        if int.from_bytes(pow_output2, 'big') < 2**238:
+            break
+        nonce += 1
+    print(nonce)
+    pow.new_block(hash_bytes, nonce, [], {'from': accounts[0]})
