@@ -61,7 +61,7 @@ contract PoW {
         PoWVote memory best_vote;
         bool best = false;
         for (uint i = 0; i < miner_count; i++) {
-                console.logUint(i);
+            console.logUint(i);
             address m = miners[i];
             PoWVote memory v = votes[m];
             PoWCanidate memory c = canidates[v.commitment];
@@ -70,7 +70,7 @@ contract PoW {
                 best_vote = v;
                 best = true;
                 prev_votes = c.votes;
-                console.logUint(i);
+                console.logUint(prev_votes);
             }
             delete miners[i];
             delete votes[m];
@@ -106,7 +106,7 @@ contract PoW {
         // parent_nonce = nonce;
         prev_timestamp = block.timestamp;
 
-        emit NewBlock(commitment, miner, parent_height+1);
+        emit NewBlock(commitment, miner, parent_height);
         return block_hash;
     }
 
@@ -121,13 +121,18 @@ contract PoW {
         bytes32 block_hash = sha256(bytes.concat(parent_hash, commitment, bytes4(parent_height), bytes20(miner), bytes8(nonce)));
         require(uint256(block_hash) < 2**parent_difficulty, "difficulty required");
 
-        // miner_count += 1;
-        // miners[miner_count] = miner;
-        // votes[miner] = PoWVote(commitment, nonce);
-        // canidates[commitment] = PoWCanidate(miner, nonce, 1);
+        miner_count += 1;
+        miners[miner_count] = miner;
+        votes[miner] = PoWVote(commitment, nonce);
+        console.logAddress(canidates[commitment].miner);
+        if(canidates[commitment].miner == address(0)){
+            canidates[commitment] = PoWCanidate(miner, nonce, 1);
+        }else{
+            canidates[commitment].votes += 1;
+        }
         // parent_hash = block_hash;
         // parent_nonce = nonce;
-        emit NewBlock(commitment, miner, parent_height+1);
+        emit NewBlock(commitment, miner, parent_height);
         return block_hash;
     }
 }
